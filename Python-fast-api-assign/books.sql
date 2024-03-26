@@ -1,0 +1,1 @@
+CREATE DATABASE books_and_reviews WITH OWNER admin;
