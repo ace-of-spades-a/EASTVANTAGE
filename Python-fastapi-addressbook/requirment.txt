@@ -1,7 +1,10 @@
 fastapi
 pydentic
+pydantic[email]
 sqlalchemy
 uvicorn
 python-dotenv
 psycopg2
 geopy
+pyjwt
+decouple
