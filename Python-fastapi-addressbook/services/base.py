@@ -35,3 +35,10 @@ class BaseDataManager(SessionMixin):
 
     def add_all(self, models: Sequence[Any]) -> None:
         self.session.add_all(models)
+
+    def update_one(self, update_stmt: Executable) -> Any:
+        return self.session.scalar(update_stmt)
+
+    def delete(self, delete_stmt: Executable):
+        self.session.execute(delete_stmt)
+        return True
