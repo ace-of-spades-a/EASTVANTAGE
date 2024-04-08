@@ -104,7 +104,7 @@ async def update_address(
     address: Address,
     res: Response,
     session: Session = Depends(create_session),
-) -> Address:
+) -> Address | dict:
     """update the record based on the ID."""
 
     validate_address(address)
@@ -117,7 +117,7 @@ async def update_address(
 
     else:
         res.status_code = status.HTTP_400_BAD_REQUEST
-        return False
+        return {"message": "Issues with input data or with ID."}
 
 
 @router.delete(
@@ -127,10 +127,15 @@ async def update_address(
     tags=["Address"],
 )
 async def delete_address(
-    address_id: int, session: Session = Depends(create_session)
+    address_id: int,
+    res: Response,
+    session: Session = Depends(create_session),
 ) -> dict:
     """Delete the record based on ID."""
 
     add = AddressDataManager(session).remove(address_id)
     if add:
         return {"message": "Address deleted successfully"}
+    else:
+        res.status_code = status.HTTP_404_NOT_FOUND
+        return {"Message": "Invalid Address ID"}

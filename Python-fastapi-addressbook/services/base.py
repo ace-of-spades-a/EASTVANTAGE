@@ -40,5 +40,5 @@ class BaseDataManager(SessionMixin):
         return self.session.scalar(update_stmt)
 
     def delete(self, delete_stmt: Executable):
-        self.session.execute(delete_stmt)
-        return True
+        dele = self.session.execute(delete_stmt)
+        return True if dele.rowcount > 0 else False
