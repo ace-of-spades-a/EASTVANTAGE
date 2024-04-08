@@ -92,9 +92,42 @@ async def get_addresses_within_distance(
         return addresses
 
 
+@router.get(
+    "/all_addresses/",
+    response_model=List[ResponseAddress],
+    dependencies=[Depends(JWTBearer())],
+    tags=["Address"],
+    status_code=status.HTTP_302_FOUND,
+)
+async def get_addresses_within_distance(
+    res: Response,
+    session: Session = Depends(create_session),
+) -> List[ResponseAddress]:
+    """return address within the given distance."""
+
+    addresses = []
+    rows = AddressDataManager(session).get_addresses()
+    for row in rows:
+        row = row.__dict__
+        del row["_sa_instance_state"]
+        addresses.append(
+            {
+                "id": row.get("id"),
+                "name": row.get("name"),
+                "latitude": row.get("latitude"),
+                "longitude": row.get("longitude"),
+            }
+        )
+    if addresses:
+        return addresses
+    else:
+        res.status_code = status.HTTP_404_NOT_FOUND
+        return addresses
+
+
 @router.put(
     "/addresses/{address_id}/",
-    response_model=Address | bool,
+    response_model=dict,
     dependencies=[Depends(JWTBearer())],
     tags=["Address"],
     status_code=status.HTTP_200_OK,
@@ -104,20 +137,20 @@ async def update_address(
     address: Address,
     res: Response,
     session: Session = Depends(create_session),
-) -> Address | dict:
+) -> dict:
     """update the record based on the ID."""
 
     validate_address(address)
+    add = None
     add = AddressService(session).convert_updated_data_into_obj(
         address, address_id
     )
-    add = None
-    if add:
+    if "Success" in add:
+        add.update({"values": address.__dict__})
         return add
-
     else:
         res.status_code = status.HTTP_400_BAD_REQUEST
-        return {"message": "Issues with input data or with ID."}
+        return add
 
 
 @router.delete(

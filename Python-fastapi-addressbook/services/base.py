@@ -37,7 +37,8 @@ class BaseDataManager(SessionMixin):
         self.session.add_all(models)
 
     def update_one(self, update_stmt: Executable) -> Any:
-        return self.session.scalar(update_stmt)
+        res = self.session.execute(update_stmt)
+        print("---")
 
     def delete(self, delete_stmt: Executable):
         dele = self.session.execute(delete_stmt)
